@@ -1,0 +1,56 @@
+# The docker-compose.yml file for the simple-api-student project
+# This file is used to configure the services that make up the project.
+# For more information on the Compose file, see https://docs.docker.com/compose/compose-file/
+# For more information on Docker Compose, see https://docs.docker.com/compose/
+
+
+# The version of the Compose file format
+version: '3.7'
+
+# The services that make up the project
+services:
+    # The backend service
+    backend:
+        # The build context for the backend service
+        build:
+          # The location of the Dockerfile for the backend service
+          context: ./simple-api-student-main
+        # The networks that the backend service will be connected to
+        networks:
+          ["my-network"]
+        # Only after the database service is ready, the backend service will start
+        depends_on:
+          ["database"]
+
+    # The database service
+    database:
+        # The build context for the database service
+        build:
+          # The location of the Dockerfile for the database service
+          context: ./postgresql/
+        # The networks that the database service will be connected to
+        networks:
+          ["my-network"]
+        # The hostname of the database service
+        hostname: postgres
+
+    # The http_server service
+    httpd:
+        # The build context for the http_server service
+        build:
+          # The location of the Dockerfile for the http_server service
+          context: ./http_server/
+        # The ports that the http_server service will expose
+        ports:
+         ["80:80"]
+        # The networks that the http_server service will be connected to
+        networks:
+          ["my-network"]
+        # Only after the backend service is ready, the http_server service will start
+        depends_on:
+          ["backend"]
+
+# The networks that will be created
+networks:
+    # The network will be created with the name "my-network"
+    my-network:
